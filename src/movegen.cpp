@@ -101,38 +101,35 @@ namespace Stockfish {
             // Promotions and underpromotions
             if (pawnsOn7)
             {
-                Bitboard b1 = shift<UpRight>(pawnsOn7) & enemies;
-                Bitboard b2 = shift<UpLeft>(pawnsOn7) & enemies;
-                Bitboard b3 = shift<Up>(pawnsOn7) & emptySquares;
+                Bitboard b = shift<UpRight>(pawnsOn7) & enemies;
+                while (b)
+                    moveList = make_promotions<Type, UpRight, true>(moveList, pop_lsb(b));
 
+                b = shift<UpLeft>(pawnsOn7) & enemies;
+                while (b)
+                    moveList = make_promotions<Type, UpLeft, true>(moveList, pop_lsb(b));
+
+                b = shift<Up>(pawnsOn7) & emptySquares;
                 if constexpr (Type == EVASIONS)
-                    b3 &= target;
-
-                while (b1)
-                    moveList = make_promotions<Type, UpRight, true>(moveList, pop_lsb(b1));
-
-                while (b2)
-                    moveList = make_promotions<Type, UpLeft, true>(moveList, pop_lsb(b2));
-
-                while (b3)
-                    moveList = make_promotions<Type, Up, false>(moveList, pop_lsb(b3));
+                    b &= target;
+                while (b)
+                    moveList = make_promotions<Type, Up, false>(moveList, pop_lsb(b));
             }
 
             // Standard and en passant captures
             if constexpr (Type == CAPTURES || Type == EVASIONS || Type == NON_EVASIONS)
             {
-                Bitboard b1 = shift<UpRight>(pawnsNotOn7) & enemies;
-                Bitboard b2 = shift<UpLeft>(pawnsNotOn7) & enemies;
-
-                while (b1)
+                Bitboard b = shift<UpRight>(pawnsNotOn7) & enemies;
+                while (b)
                 {
-                    Square to = pop_lsb(b1);
+                    Square to = pop_lsb(b);
                     *moveList++ = make_move(to - UpRight, to);
                 }
 
-                while (b2)
+                b = shift<UpLeft>(pawnsNotOn7) & enemies;
+                while (b)
                 {
-                    Square to = pop_lsb(b2);
+                    Square to = pop_lsb(b);
                     *moveList++ = make_move(to - UpLeft, to);
                 }
 
@@ -144,12 +141,12 @@ namespace Stockfish {
                     if (Type == EVASIONS && (target & (pos.ep_square() + Up)))
                         return moveList;
 
-                    b1 = pawnsNotOn7 & pawn_attacks_bb(Them, pos.ep_square());
+                    b = pawnsNotOn7 & pawn_attacks_bb(Them, pos.ep_square());
 
-                    assert(b1);
+                    assert(b);
 
-                    while (b1)
-                        *moveList++ = make<EN_PASSANT>(pop_lsb(b1), pos.ep_square());
+                    while (b)
+                        *moveList++ = make<EN_PASSANT>(pop_lsb(b), pos.ep_square());
                 }
             }
 
@@ -193,10 +190,10 @@ namespace Stockfish {
             // Skip generating non-king moves when in double check
             if (Type != EVASIONS || !more_than_one(pos.checkers()))
             {
-                target = Type == EVASIONS ? between_bb(ksq, lsb(pos.checkers()))
-                    : Type == NON_EVASIONS ? ~pos.pieces(Us)
-                    : Type == CAPTURES ? pos.pieces(~Us)
-                    : ~pos.pieces(); // QUIETS || QUIET_CHECKS
+                target = Type == EVASIONS     ? between_bb(ksq, lsb(pos.checkers()))
+                       : Type == NON_EVASIONS ? ~pos.pieces(Us)
+                       : Type == CAPTURES     ? pos.pieces(~Us)
+                       : ~pos.pieces(); // QUIETS || QUIET_CHECKS
 
                 moveList = generate_pawn_moves<Us, Type>(pos, moveList, target);
                 moveList = generate_moves<Us, KNIGHT, Checks>(pos, moveList, target);
@@ -242,8 +239,7 @@ namespace Stockfish {
 
         Color us = pos.side_to_move();
 
-        return us == WHITE ? generate_all<WHITE, Type>(pos, moveList)
-            : generate_all<BLACK, Type>(pos, moveList);
+        return us == WHITE ? generate_all<WHITE, Type>(pos, moveList) : generate_all<BLACK, Type>(pos, moveList);
     }
 
     // Explicit template instantiations
@@ -266,8 +262,7 @@ namespace Stockfish {
 
         moveList = pos.checkers() ? generate<EVASIONS>(pos, moveList) : generate<NON_EVASIONS>(pos, moveList);
         while (cur != moveList)
-            if (((pinned & from_sq(*cur)) || from_sq(*cur) == ksq || type_of(*cur) == EN_PASSANT)
-                && !pos.legal(*cur))
+            if (((pinned & from_sq(*cur)) || from_sq(*cur) == ksq || type_of(*cur) == EN_PASSANT) && !pos.legal(*cur))
                 *cur = (--moveList)->move;
             else
                 ++cur;
