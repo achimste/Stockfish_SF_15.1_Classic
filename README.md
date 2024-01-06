@@ -26,14 +26,14 @@ Stockfish with it.
 This is a stripped down version of the last Stockfish version that contains the classic
 evaluation (i.e without NNUE network). I made this for nostalgic and didactical reasons.
 
-WARNING (needs to be fixed)!*
-I don't have Linux, so the Makefile has not been tested.*
-I provide MS Visual Studio project files for compilation.*
+WARNING (needs to be fixed)!<br>
+I don't have Linux, so the Makefile has not been tested.<br>
+I provide MS Visual Studio project files for compilation.<br>
 Note: You must compile with C++20 or better.
 
-Special:*
-I have incorporated the special mate function from Joerg Oster's "Huntsman-2023".*
-This is enabled when you enter 'go mate ...'*
+Special:<br>
+I have incorporated the special mate function from Joerg Oster's "Huntsman-2023".<br>
+This is enabled when you enter 'go mate ...'
 
 ## Files
 
@@ -162,10 +162,10 @@ For developers the following non-standard commands might be of interest, mainly 
 
   * #### test mate
     Tests the fast specialized mate solving chess function taken from Joerg Oster's
-	Stockfish derivative called "Huntsman 2023".*
-	The positions are taken from the file matetrack.epd.*
-	The results are stored in a CSV file.*
-	The mating pv line is written in short algebraic notation.*
+	Stockfish derivative called "Huntsman 2023".<br>
+	The positions are taken from the file matetrack.epd.<br>
+	The results are stored in a CSV file.<br>
+	The mating pv line is written in short algebraic notation.<br>
 	It is recommended to set the hash to at least 1024 MB and use at least 2 threads.
 
 
