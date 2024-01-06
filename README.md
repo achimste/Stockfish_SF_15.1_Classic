@@ -31,6 +31,10 @@ I don't have Linux, so the Makefile has not been tested.*
 I provide MS Visual Studio project files for compilation.*
 Note: You must compile with C++20 or better.
 
+Special:*
+I have incorporated the special mate function from Joerg Oster's "Huntsman-2023".*
+This is enabled when you enter 'go mate ...'*
+
 ## Files
 
 This distribution of Stockfish consists of the following files:
